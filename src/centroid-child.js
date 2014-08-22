@@ -4,7 +4,7 @@ var fs = require('fs'),
     spawn = require('child_process').spawn,
     geolib = require('geolib');
 
-var cmd = '/usr/local/bin/node';
+var cmd = 'node';
 var file = path.resolve( __dirname + '/child-extent.js' );
 var env = process.env;
 env['NODE_PATH'] = path.resolve( __dirname + '/../node_modules' );
