@@ -1,0 +1,25 @@
+{
+  "name": "quattroshapes-pipeline",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "geojson-extent": "^0.3.1",
+    "geolib": "^2.0.14",
+    "geopipes-elasticsearch-backend": "0.0.3",
+    "greedy-stream": "latest",
+    "pelias-config": "latest",
+    "pelias-esclient": "latest",
+    "pelias-suggester-pipeline": "0.0.3",
+    "shapefile-stream": "0.0.2",
+    "through2": "^0.6.1"
+  }
+}
