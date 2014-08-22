@@ -5,11 +5,11 @@ var shapefile = require('shapefile-stream'),
     esbackend = require('../src/es_backend'),
     mapper = require('../src/mapper');
 
-// point me to your data
-var basepath = '/media/hdd/osm/quattroshapes/simplified';
+// use datapath setting from your config file
+var basepath = settings.imports.quattroshapes.datapath;
 
-// or uncomment me to use the setting from your config file
-// var basepath = settings.imports.quattroshapes.datapath;
+// testing
+// basepath = '/media/hdd/osm/quattroshapes/simplified';
 
 var imports = [
   {
