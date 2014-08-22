@@ -75,4 +75,5 @@ if( !found ){
   console.log( imports.map( function( i ){
     return i.type;
   }).join(', '));
+  process.exit(1);
 }
