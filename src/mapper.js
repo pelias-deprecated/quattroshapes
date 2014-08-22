@@ -27,11 +27,6 @@ function generateMapper( props, type ){
 
       var id = generateId( data );
 
-      if( !id ){
-        console.log( 'monkies' );
-        process.exit(1);
-      }
-
       var record = {
         id: id,
         type: type, // required to generate the unique id (suggester payload)
@@ -75,7 +70,7 @@ function generateMapper( props, type ){
     }
   };
 
-  var stream = greedy.obj( mapper );
+  var stream = through.obj( mapper );
   return stream;
 }
 
