@@ -1,5 +1,6 @@
 
-var shapefile = require('shapefile-stream'),
+var fs = require('fs'),
+    shapefile = require('shapefile-stream'),
     suggester = require('pelias-suggester-pipeline'),
     settings = require('pelias-config').generate(),
     esbackend = require('../src/es_backend'),
@@ -53,8 +54,14 @@ var imports = [
 var found = false;
 imports.forEach( function( shp ){
   if( shp.type === process.argv[2] ){
-    console.log( 'running imports for %s', shp.type );
+    console.log( 'running imports for: %s', shp.type );
     found = true;
+
+    if( !fs.existsSync( shp.path ) ){
+      console.error( 'failed to load %s', shp.path );
+      console.error( 'please check your paths and try again' );
+      process.exit(1);
+    }
 
     shapefile.createReadStream( shp.path )
       .pipe( mapper( shp.props, shp.type ) )
