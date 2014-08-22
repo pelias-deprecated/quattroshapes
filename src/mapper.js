@@ -70,7 +70,7 @@ function generateMapper( props, type ){
     }
   };
 
-  var stream = through.obj( mapper );
+  var stream = greedy.obj( mapper );
   return stream;
 }
 
