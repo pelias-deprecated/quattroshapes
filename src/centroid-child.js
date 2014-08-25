@@ -12,36 +12,46 @@ env['NODE_PATH'] = path.resolve( __dirname + '/../node_modules' );
 function getJsonCenterExec( geometry, cb ){
 
   var child = spawn( cmd, [file], { env: env } );
-  child.stdin.setEncoding = 'utf-8';
+  child.stdin.setEncoding('utf-8');
+  child.stdout.setEncoding('utf-8');
 
   var stdout = '';
   child.stdout.on( 'data', function( chunk, enc ){
-    stdout += chunk.toString();
+    if( chunk ) stdout += chunk.toString();
   });
 
   var stderr = '';
   child.stderr.on( 'data', function( chunk, enc ){
-    stderr += chunk.toString();
+    if( chunk ) stderr += chunk.toString();
   });
 
   child.stdout.on( 'close', function(){
     var json = null;
+    var err = null;
     try {
       // console.log( 'parse stdout', '~~' + stdout + '~~' );
       json = JSON.parse( stdout );
     }
     catch ( e ){
-      return cb( stderr || e || 'error parsing json' );
+      err = stderr || e || 'error parsing json';
     }
-    return cb( null, json );
+    return cb( err, json );
   });
 
   child.on( 'error', console.error.bind( console, 'child.err' ) );
   child.stdin.on( 'error', console.error.bind( console, 'stdin.err' ) );
   child.stdout.on( 'error', console.error.bind( console, 'stdout.err' ) );
 
-  child.stdin.write( JSON.stringify( geometry ), function(){
-    child.stdin.end();
+  var json = JSON.stringify( geometry );
+  // if( !json ){
+  //   console.log( JSON.stringify( json, null, 2 ) );
+  //   console.log( json );
+  //   console.log( 'null json' );
+  //   process.exit(1);
+  // }
+
+  child.stdin.write( json, function(){
+    setImmediate( child.stdin.end.bind( child.stdin ) );
   });
 }
 
@@ -51,16 +61,22 @@ module.exports = function( geometry, cb ){
 
     if( err ) return cb( err );
 
-    var center = geolib.getCenter([
-      [ bounds[0], bounds[1] ],
-      [ bounds[2], bounds[3] ]
-    ]);
+      // console.log( bounds );
+    if( Array.isArray( bounds ) && bounds.length >= 4 ){
 
-    if( center.latitude && center.longitude ){
-      var centroid = { lat: center.latitude, lon: center.longitude };
-      return cb( null, centroid );
+      var center = geolib.getCenter([
+        [ bounds[0], bounds[1] ],
+        [ bounds[2], bounds[3] ]
+      ]);
+
+      if( center.latitude && center.longitude ){
+        var centroid = { lat: center.latitude, lon: center.longitude };
+        return cb( null, centroid );
+      }
+
     }
 
+    console.error( 'invalid bounds', bounds );
     return cb( 'geolib.getCenter failed' );
   });
 };

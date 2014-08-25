@@ -51,7 +51,8 @@ function generateMapper( props, type ){
 
         if( err || !center ){
           console.error( 'center', err, center );
-          throw new Error( err || 'invalid centroid' );
+          console.error( err || 'invalid centroid' );
+          return next();
         }
 
         // set record center_point
