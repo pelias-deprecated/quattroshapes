@@ -29,7 +29,9 @@ function generateMapper( props, type ){
 
       var record = {
         id: id,
-        type: type, // required to generate the unique id (suggester payload)
+        _meta: {
+          type: type, // required to generate the unique id (suggester payload)
+        },
         name: {
           default: data.properties[ props.name ]
         },

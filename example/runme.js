@@ -4,7 +4,9 @@ var fs = require('fs'),
     suggester = require('pelias-suggester-pipeline'),
     settings = require('pelias-config').generate(),
     esbackend = require('../src/es_backend'),
-    mapper = require('../src/mapper');
+    mapper = require('../src/mapper'),
+    propStream = require('prop-stream'),
+    schema = require('pelias-schema');
 
 // use datapath setting from your config file
 var basepath = settings.imports.quattroshapes.datapath;
@@ -63,9 +65,13 @@ imports.forEach( function( shp ){
       process.exit(1);
     }
 
+    // remove any props not in the geonames mapping
+    var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
+
     shapefile.createReadStream( shp.path )
       .pipe( mapper( shp.props, shp.type ) )
       .pipe( suggester.pipeline )
+      .pipe( propStream.whitelist( allowedProperties ) )
       .pipe( esbackend( shp.index, shp.type ).createPullStream() );
   }
 });

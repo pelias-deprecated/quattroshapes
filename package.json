@@ -18,7 +18,9 @@
     "greedy-stream": "latest",
     "pelias-config": "latest",
     "pelias-esclient": "latest",
+    "pelias-schema": "latest",
     "pelias-suggester-pipeline": "latest",
+    "prop-stream": "0.0.0",
     "shapefile-stream": "latest",
     "through2": "^0.6.1"
   }
