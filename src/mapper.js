@@ -4,6 +4,13 @@ var greedy = require('greedy-stream'),
     // centroid = require('./centroid');
   centroid = require('./centroid-child');
 
+function capitalize( str ) {
+  return ( str || '' ).toLowerCase()
+            .replace( /(?:^|\s)\S/g, function(a){
+              return a.toUpperCase();
+            });
+}
+
 function generateMapper( props, type ){
 
   var i = 0;
@@ -33,19 +40,21 @@ function generateMapper( props, type ){
           type: type, // required to generate the unique id (suggester payload)
         },
         name: {
-          default: data.properties[ props.name ]
+          default: capitalize(
+            data.properties[ props.name[0] ] || data.properties[ props.name[1] ]
+          )
         },
-        admin0: data.properties[ props.admin0 ],
-        admin1: data.properties[ props.admin1 ],
-        admin2: data.properties[ props.admin2 ],
+        admin0: capitalize( data.properties[ props.admin0 ] ) || undefined,
+        admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
+        admin2: capitalize( data.properties[ props.admin2 ] ) || undefined,
         gn_id:  data.properties[ props.gn ],
         woe_id: data.properties[ props.woe ],
         boundaries: data.geometry
       };
 
       // add alternate name if available
-      if( data.properties[ props.name + '_alt' ] ){
-        record.name.alt = data.properties[ props.name + '_alt' ];
+      if( data.properties[ props.name[0] + '_alt' ] ){
+        record.name.alt = capitalize( data.properties[ props.name[0] + '_alt' ] );
       }
 
       // compute centroid
