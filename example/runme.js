@@ -18,6 +18,7 @@ var imports = [
   {
     path: basepath + '/admin0-0001.shp',
     props: {
+      alpha3: 'qs_adm0_a3',
       name:   ['qs_a0','qs_adm0'],
       admin0: 'qs_adm0',
       admin1: 'qs_a1',
@@ -31,6 +32,7 @@ var imports = [
   {
     path: basepath + '/admin1-0001.shp',
     props: {
+      alpha3: 'qs_adm0_a3',
       name:   ['qs_a1'],
       admin0: 'qs_adm0',
       admin1: 'qs_a1',
@@ -44,6 +46,7 @@ var imports = [
   {
     path: basepath + '/admin2-0001.shp',
     props: {
+      alpha3: 'qs_adm0_a3',
       name:   ['qs_a2'],
       admin0: 'qs_adm0',
       admin1: 'qs_a1',
@@ -57,6 +60,7 @@ var imports = [
   {
     path: basepath + '/localadmin-0001.shp',
     props: {
+      alpha3: 'qs_adm0_a3',
       name:   ['qs_la'],
       admin0: 'qs_adm0',
       admin1: 'qs_a1',
@@ -107,7 +111,7 @@ imports.forEach( function( shp ){
       process.exit(1);
     }
 
-    // remove any props not in the geonames mapping
+    // remove any props not in the schema mapping
     var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
 
     shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )

@@ -1,14 +1,22 @@
 
 var greedy = require('greedy-stream'),
   through = require('through2'),
+  trimmer = require('trimmer'),
+  admin1AbbreviationMap = require('../meta/us_states.json'),
     // centroid = require('./centroid');
   centroid = require('./centroid-child');
 
 function capitalize( str ) {
-  return ( str || '' ).toLowerCase()
+  if( 'string' !== typeof str ){ return ''; }
+
+  // some quattroshapes have a leading '*'
+  str = trimmer( str, '*' );
+
+  return str.toLowerCase()
             .replace( /(?:^|\s)\S/g, function(a){
               return a.toUpperCase();
-            });
+            })
+            .trim();
 }
 
 function generateMapper( props, type ){
@@ -44,6 +52,7 @@ function generateMapper( props, type ){
             data.properties[ props.name[0] ] || data.properties[ props.name[1] ]
           )
         },
+        alpha3: ( data.properties[ props.alpha3 ] || '' ).toUpperCase() || undefined,
         admin0: capitalize( data.properties[ props.admin0 ] ) || undefined,
         admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
         admin2: capitalize( data.properties[ props.admin2 ] ) || undefined,
@@ -55,6 +64,15 @@ function generateMapper( props, type ){
       // add alternate name if available
       if( data.properties[ props.name[0] + '_alt' ] ){
         record.name.alt = capitalize( data.properties[ props.name[0] + '_alt' ] );
+      }
+
+      // admin1 abbreviations (cirrently only USA state shortcodes)
+      if( 'admin1' === type && 'USA' === record.alpha3 ){
+        var nameProp = data.properties[ props.name[0] ];
+        var abbr = admin1AbbreviationMap[ nameProp ];
+        if( abbr ){
+          record.admin1_abbr = abbr;
+        }
       }
 
       // compute centroid
