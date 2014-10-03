@@ -81,7 +81,10 @@ function generateMapper( props, type ){
         if( err || !center ){
           console.error( 'center', err, center );
           console.error( err || 'invalid centroid' );
-          return next();
+
+          // pass invalid center downstream to trigger
+          // error count at esclient
+          center = null;
         }
 
         // set record center_point
