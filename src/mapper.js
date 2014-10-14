@@ -56,8 +56,8 @@ function generateMapper( props, type ){
         admin0: capitalize( data.properties[ props.admin0 ] ) || undefined,
         admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
         admin2: capitalize( data.properties[ props.admin2 ] ) || undefined,
-        gn_id:  data.properties[ props.gn ],
-        woe_id: data.properties[ props.woe ],
+        gn_id:  parseInt( data.properties[ props.gn ], 10 ), // some ids are comma seperated
+        woe_id: parseInt( data.properties[ props.woe ], 10 ), // as per "5860714,5860715"
         boundaries: data.geometry
       };
 
@@ -103,7 +103,7 @@ function generateMapper( props, type ){
     }
   };
 
-  var stream = greedy.obj( mapper );
+  var stream = through.obj( mapper );
   return stream;
 }
 
