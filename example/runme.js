@@ -3,10 +3,11 @@ var fs = require('fs'),
     shapefile = require('shapefile-stream'),
     suggester = require('pelias-suggester-pipeline'),
     settings = require('pelias-config').generate(),
-    esbackend = require('../src/es_backend'),
     mapper = require('../src/mapper'),
     propStream = require('prop-stream'),
-    schema = require('pelias-schema');
+    schema = require('pelias-schema'),
+    through = require('through2'),
+    dbclient = require('dbclient')({ batchSize: 1 });
 
 // use datapath setting from your config file
 var basepath = settings.imports.quattroshapes.datapath;
@@ -102,7 +103,7 @@ var imports = [
 var found = false;
 imports.forEach( function( shp ){
   if( shp.type === process.argv[2] ){
-    console.log( 'running imports for: %s', shp.type );
+    console.error( 'running imports for: %s', shp.type );
     found = true;
 
     if( !fs.existsSync( shp.path ) ){
@@ -118,13 +119,24 @@ imports.forEach( function( shp ){
       .pipe( mapper( shp.props, shp.type ) )
       .pipe( suggester.pipeline )
       .pipe( propStream.whitelist( allowedProperties ) )
-      .pipe( esbackend( shp.index, shp.type ).createPullStream() );
+      .pipe( through.obj( function( item, enc, next ){
+        var id = item.id;
+        delete item.id;
+        this.push({
+          _index: 'pelias',
+          _type: shp.type,
+          _id: id,
+          data: item
+        });
+        next();
+      }))
+      .pipe( dbclient );
   }
 });
 
 if( !found ){
-  console.log( 'please select an import...' );
-  console.log( imports.map( function( i ){
+  console.error( 'please select an import...' );
+  console.error( imports.map( function( i ){
     return i.type;
   }).join(', '));
   process.exit(1);
