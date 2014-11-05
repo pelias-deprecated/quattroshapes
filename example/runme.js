@@ -16,7 +16,7 @@ var basepath = settings.imports.quattroshapes.datapath;
 
 var imports = [
   {
-    path: basepath + '/admin0-0001.shp',
+    path: basepath + '/qs_adm0.shp',
     props: {
       alpha3: 'qs_adm0_a3',
       name:   ['qs_a0','qs_adm0'],
@@ -30,7 +30,7 @@ var imports = [
     type:     'admin0'
   },
   {
-    path: basepath + '/admin1-0001.shp',
+    path: basepath + '/qs_adm1.shp',
     props: {
       alpha3: 'qs_adm0_a3',
       name:   ['qs_a1'],
@@ -44,7 +44,7 @@ var imports = [
     type:     'admin1'
   },
   {
-    path: basepath + '/admin2-0001.shp',
+    path: basepath + '/qs_adm2.shp',
     props: {
       alpha3: 'qs_adm0_a3',
       name:   ['qs_a2'],
@@ -58,7 +58,7 @@ var imports = [
     type:     'admin2'
   },
   {
-    path: basepath + '/localadmin-0001.shp',
+    path: basepath + '/qs_localadmin.shp',
     props: {
       alpha3: 'qs_adm0_a3',
       name:   ['qs_la'],
@@ -72,7 +72,7 @@ var imports = [
     type:     'local_admin'
   },
   {
-    path: basepath + '/localities-0001.shp',
+    path: basepath + '/qs_localities.shp',
     props: {
       name:   ['qs_loc'],
       admin0: 'qs_adm0',
@@ -85,7 +85,7 @@ var imports = [
     type:     'locality'
   },
   {
-    path: basepath + '/neighborhoods-0001.shp',
+    path: basepath + '/qs_neighborhoods.shp',
     props: {
       name:   ['name'],
       admin0: 'name_adm0',
