@@ -104,6 +104,7 @@ var imports = [
 
 var found = false;
 imports.forEach( function( shp ){
+
   if( shp.type === process.argv[2] ){
     console.error( 'running imports for: %s', shp.type );
     found = true;
@@ -114,10 +115,23 @@ imports.forEach( function( shp ){
       process.exit(1);
     }
 
+    var filterAlpha3 = ( process.argv[3] || '' ).toUpperCase();
+    if( filterAlpha3 && filterAlpha3.length !== 3 ){
+      console.error( 'invalid alpha3 filter, should be 3 characters' );
+      process.exit(1);
+    }
+
     // remove any props not in the schema mapping
     var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
 
     shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
+      .pipe( through.obj( function( item, enc, next ){
+        // alpha3 filtering
+        if( filterAlpha3.length !== 3 || filterAlpha3 === item.properties.qs_adm0_a3 ){
+          this.push( item );
+        }
+        next();
+      }))
       .pipe( mapper( shp.props, shp.type ) )
       .pipe( suggester.pipeline )
       .pipe( propStream.whitelist( allowedProperties ) )

@@ -44,7 +44,7 @@ function generateMapper( props, type ){
 
       // -- names
       var name = data.properties[ props.name[0] ] || data.properties[ props.name[1] ];
-      var names = name.split('#');
+      var names = ( name || '' ).split('#');
 
       // add alternate name if available
       if( data.properties[ props.name[0] + '_alt' ] ){
