@@ -64,14 +64,18 @@ module.exports = function( geometry, cb ){
       // console.log( bounds );
     if( Array.isArray( bounds ) && bounds.length >= 4 ){
 
-      var center = geolib.getCenter([
-        [ bounds[0], bounds[1] ],
-        [ bounds[2], bounds[3] ]
-      ]);
+      try {
+        var center = geolib.getCenter([
+          [ bounds[0], bounds[1] ],
+          [ bounds[2], bounds[3] ]
+        ]);
 
-      if( center.latitude && center.longitude ){
-        var centroid = { lat: center.latitude, lon: center.longitude };
-        return cb( null, centroid );
+        if( center.latitude && center.longitude ){
+          var centroid = { lat: center.latitude, lon: center.longitude };
+          return cb( null, centroid );
+        }
+      } catch ( e ){
+        return cb( e );
       }
 
     }

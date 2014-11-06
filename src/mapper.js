@@ -42,16 +42,26 @@ function generateMapper( props, type ){
 
       var id = generateId( data );
 
+      // -- names
+      var name = data.properties[ props.name[0] ] || data.properties[ props.name[1] ];
+      var names = ( name || '' ).split('#');
+
+      // add alternate name if available
+      if( data.properties[ props.name[0] + '_alt' ] ){
+        names.push( data.properties[ props.name[0] + '_alt' ] );
+      }
+
+      // de-dupe names
+      names = names.filter( function( i, pos ) {
+        return names.indexOf( i ) == pos;
+      });
+
       var record = {
         id: id,
         _meta: {
           type: type, // required to generate the unique id (suggester payload)
         },
-        name: {
-          default: capitalize(
-            data.properties[ props.name[0] ] || data.properties[ props.name[1] ]
-          )
-        },
+        name: {},
         alpha3: ( data.properties[ props.alpha3 ] || '' ).toUpperCase() || undefined,
         admin0: capitalize( data.properties[ props.admin0 ] ) || undefined,
         admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
@@ -61,10 +71,14 @@ function generateMapper( props, type ){
         boundaries: data.geometry
       };
 
-      // add alternate name if available
-      if( data.properties[ props.name[0] + '_alt' ] ){
-        record.name.alt = capitalize( data.properties[ props.name[0] + '_alt' ] );
-      }
+      // extract names and alt names
+      names.forEach( function( name, o ){
+        if( !o ){ // first name
+          record.name.default = capitalize( name );
+        } else {
+          record.name[ 'alt' + o ] = capitalize( name );
+        }
+      });
 
       // admin1 abbreviations (cirrently only USA state shortcodes)
       if( 'admin1' === type && 'USA' === record.alpha3 ){
