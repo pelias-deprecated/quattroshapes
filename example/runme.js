@@ -75,6 +75,7 @@ var imports = [
   {
     path: basepath + '/qs_localities.shp',
     props: {
+      alpha3: 'qs_adm0_a3',
       name:   ['qs_loc'],
       admin0: 'qs_adm0',
       admin1: 'qs_a1',
@@ -88,6 +89,7 @@ var imports = [
   {
     path: basepath + '/qs_neighborhoods.shp',
     props: {
+      alpha3: 'qs_adm0_a3',
       name:   ['name'],
       admin0: 'name_adm0',
       admin1: 'name_adm1',
