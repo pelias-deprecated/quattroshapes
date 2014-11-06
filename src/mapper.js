@@ -41,6 +41,8 @@ function generateMapper( props, type ){
     try {
 
       var id = generateId( data );
+      var name = data.properties[ props.name[0] ] || data.properties[ props.name[1] ];
+      var names = name.split('#');
 
       var record = {
         id: id,
@@ -60,6 +62,15 @@ function generateMapper( props, type ){
         woe_id: parseInt( data.properties[ props.woe ], 10 ), // as per "5860714,5860715"
         boundaries: data.geometry
       };
+
+      // extract names and alt names
+      names.forEach( function( name, o ){
+        if( o === 0 ){
+          record.name.default = capitalize( name );
+        } else {
+          record.name[ 'alt' + o ] = capitalize( name );
+        }
+      });
 
       // add alternate name if available
       if( data.properties[ props.name[0] + '_alt' ] ){
