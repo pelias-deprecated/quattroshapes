@@ -7,7 +7,7 @@ var fs = require('fs'),
     propStream = require('prop-stream'),
     schema = require('pelias-schema'),
     through = require('through2'),
-    dbclient = require('dbclient')({ batchSize: 1 });
+    dbclient = require('pelias-dbclient')({ batchSize: 1 });
 
 // use datapath setting from your config file
 var basepath = settings.imports.quattroshapes.datapath;
