@@ -29,7 +29,6 @@ function getJsonCenterExec( geometry, cb ){
     var json = null;
     var err = null;
     try {
-      // console.log( 'parse stdout', '~~' + stdout + '~~' );
       json = JSON.parse( stdout );
     }
     catch ( e ){
@@ -43,12 +42,6 @@ function getJsonCenterExec( geometry, cb ){
   child.stdout.on( 'error', console.error.bind( console, 'stdout.err' ) );
 
   var json = JSON.stringify( geometry );
-  // if( !json ){
-  //   console.log( JSON.stringify( json, null, 2 ) );
-  //   console.log( json );
-  //   console.log( 'null json' );
-  //   process.exit(1);
-  // }
 
   child.stdin.write( json, function(){
     setImmediate( child.stdin.end.bind( child.stdin ) );
@@ -60,8 +53,6 @@ module.exports = function( geometry, cb ){
   getJsonCenterExec( geometry, function( err, bounds ){
 
     if( err ) return cb( err );
-
-      // console.log( bounds );
     if( Array.isArray( bounds ) && bounds.length >= 4 ){
 
       try {
