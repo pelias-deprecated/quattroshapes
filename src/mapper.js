@@ -3,8 +3,7 @@ var greedy = require('greedy-stream'),
   through = require('through2'),
   trimmer = require('trimmer'),
   admin1AbbreviationMap = require('../meta/us_states.json'),
-    // centroid = require('./centroid');
-  centroid = require('./centroid-child');
+  centroid = require('./centroid');
 
 function capitalize( str ) {
   if( 'string' !== typeof str ){ return ''; }
@@ -89,32 +88,18 @@ function generateMapper( props, type ){
         }
       }
 
-      // compute centroid
-      centroid( data.geometry, function( err, center ){
-
-        if( err || !center ){
-          console.error( 'center', err, center );
-          console.error( err || 'invalid centroid' );
-
-          // pass invalid center downstream to trigger
-          // error count at esclient
-          center = null;
-        }
-
-        // set record center_point
-        record.center_point = center || {};
-
-        // push downstream
-        this.push( record );
-        next();
-
-      }.bind(this));
-
+      var center = centroid( data.geometry );
+      if( center === undefined ){
+        console.error( 'No centroid found.' );
+        center = {};
+      }
+      record.center_point = center;
+      this.push( record );
 
     } catch( e ) {
       console.error( e );
-      next();
     }
+    next();
   };
 
   var stream = through.obj( mapper );
