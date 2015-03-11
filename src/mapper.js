@@ -89,7 +89,7 @@ function generateMapper( props, type ){
       }
 
       var center = centroid( data.geometry );
-      if( center === undefined ){
+      if( center === null ){
         console.error( 'No centroid found.' );
         center = {};
       }

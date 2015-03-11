@@ -11,8 +11,7 @@ module.exports = function( geometry ){
     [ bounds[2], bounds[3] ]
   ]);
 
-  if( center.latitude !== undefined && center.longitude !== undefined ){
-    var centroid = { lat: center.latitude, lon: center.longitude };
-    return centroid;
-  }
+  return ( center.latitude !== undefined && center.longitude !== undefined ) ?
+    { lat: center.latitude, lon: center.longitude } :
+    null;
 };
