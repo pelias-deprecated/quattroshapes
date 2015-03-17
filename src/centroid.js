@@ -2,7 +2,7 @@
 var extent = require('geojson-extent'),
     geolib = require('geolib');
 
-module.exports = function( geometry, cb ){
+module.exports = function( geometry ){
 
   var bounds = extent( geometry );
 
@@ -11,11 +11,7 @@ module.exports = function( geometry, cb ){
     [ bounds[2], bounds[3] ]
   ]);
 
-  if( center.latitude && center.longitude ){
-    var centroid = { lat: center.latitude, lon: center.longitude };
-
-    return cb( null, centroid );
-  }
-
-  return cb( null, null );
+  return ( center.latitude !== undefined && center.longitude !== undefined ) ?
+    { lat: center.latitude, lon: center.longitude } :
+    null;
 };
