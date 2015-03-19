@@ -12,7 +12,7 @@ function capitalize( str ) {
   str = trimmer( str, '*' );
 
   return str.toLowerCase()
-            .replace( /(?:^|\s)\S/g, function(a){
+            .replace( /(?:^|\s|-)\S/g, function(a){
               return a.toUpperCase();
             })
             .trim();
@@ -107,3 +107,4 @@ function generateMapper( props, type ){
 }
 
 module.exports = generateMapper;
+module.exports.capitalize = capitalize;
