@@ -66,8 +66,8 @@ function generateMapper( props, type ){
         admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
         admin2: capitalize( data.properties[ props.admin2 ] ) || undefined,
         gn_id:  parseInt( data.properties[ props.gn ], 10 ), // some ids are comma seperated
-        woe_id: parseInt( data.properties[ props.woe ], 10 ), // as per "5860714,5860715"
-        boundaries: data.geometry
+        woe_id: parseInt( data.properties[ props.woe ], 10 ) // as per "5860714,5860715"
+        // boundaries: data.geometry
       };
 
       // extract names and alt names
@@ -80,8 +80,8 @@ function generateMapper( props, type ){
       });
 
       // admin1 abbreviations (cirrently only USA state shortcodes)
-      if( 'admin1' === type && 'USA' === record.alpha3 ){
-        var nameProp = data.properties[ props.name[0] ];
+      if( 'USA' === record.alpha3 && record.admin1 !== undefined ){
+        var nameProp = record.admin1;
         var abbr = admin1AbbreviationMap[ nameProp ];
         if( abbr ){
           record.admin1_abbr = abbr;
