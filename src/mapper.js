@@ -80,7 +80,7 @@ function generateMapper( props, type ){
       });
 
       // admin1 abbreviations (cirrently only USA state shortcodes)
-      if( 'USA' === record.alpha3 && record.admin1 !== undefined ){
+      if( ( 'USA' === record.alpha3 || record.admin0 === 'United States' ) && record.admin1 !== undefined ){
         var nameProp = record.admin1;
         var abbr = admin1AbbreviationMap[ nameProp ];
         if( abbr ){
