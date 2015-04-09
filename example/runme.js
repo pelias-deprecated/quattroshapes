@@ -7,7 +7,8 @@ var fs = require('fs'),
     propStream = require('prop-stream'),
     schema = require('pelias-schema'),
     through = require('through2'),
-    dbclient = require('pelias-dbclient')({ batchSize: 1 });
+    dbclient = require('pelias-dbclient')(),
+    peliasAdminLookup = require( 'pelias-admin-lookup' );
 
 // use datapath setting from your config file
 var basepath = settings.imports.quattroshapes.datapath;
@@ -124,29 +125,56 @@ imports.forEach( function( shp ){
     // remove any props not in the schema mapping
     var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
 
-    shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
-      .pipe( through.obj( function( item, enc, next ){
-        // alpha3 filtering
-        if( filterAlpha3.length !== 3 || filterAlpha3 === item.properties.qs_adm0_a3 ){
-          this.push( item );
-        }
-        next();
-      }))
-      .pipe( mapper( shp.props, shp.type ) )
-      .pipe( suggester.pipeline )
-      .pipe( propStream.whitelist( allowedProperties ) )
-      .pipe( through.obj( function( item, enc, next ){
-        var id = item.id;
-        delete item.id;
-        this.push({
-          _index: 'pelias',
-          _type: shp.type,
-          _id: id,
-          data: item
-        });
-        next();
-      }))
-      .pipe( dbclient );
+    peliasAdminLookup.lookup( function ( adminLookup ){
+      var allAdminValues = [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1', 'admin2' ];
+      var adminValuesToSet = {
+        admin0: [ 'alpha3' ],
+        admin1: [ 'alpha3', 'admin0', 'admin1_abbr' ],
+        admin2: [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1' ],
+        local_admin: allAdminValues,
+        locality: allAdminValues,
+        neighborhood: allAdminValues
+      };
+      shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
+        .pipe( through.obj( function( item, enc, next ){
+          // alpha3 filtering
+          if( filterAlpha3.length !== 3 || filterAlpha3 === item.properties.qs_adm0_a3 ){
+            this.push( item );
+          }
+          next();
+        }))
+        .pipe( mapper( shp.props, shp.type ) )
+        .pipe( through.obj(
+          function write( data, _, next ){
+            var downstream = this;
+            adminLookup.search( data.center_point, function ( adminValues ){
+              adminValuesToSet[ shp.type ].forEach( function ( prop ){
+                data[ prop ] = adminValues[ prop ];
+              });
+              downstream.push( data );
+              next();
+            });
+          },
+          function end( done ){
+            adminLookup.end();
+            done();
+          }
+        ))
+        .pipe( suggester.pipeline )
+        .pipe( propStream.whitelist( allowedProperties ) )
+        .pipe( through.obj( function( item, enc, next ){
+          var id = item.id;
+          delete item.id;
+          this.push({
+            _index: 'pelias',
+            _type: shp.type,
+            _id: id,
+            data: item
+          });
+          next();
+        }))
+        .pipe( dbclient );
+    });
   }
 });
 
