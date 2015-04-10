@@ -13,9 +13,6 @@ var fs = require('fs'),
 // use datapath setting from your config file
 var basepath = settings.imports.quattroshapes.datapath;
 
-// testing
-// basepath = '/media/hdd/osm/quattroshapes/simplified';
-
 var imports = [
   {
     path: basepath + '/qs_adm0.shp',
@@ -134,18 +131,36 @@ imports.forEach( function( shp ){
       neighborhood: allAdminValues
     };
 
-    peliasAdminLookup.lookup( function ( adminLookup ){
-      var adminValuesToSet = adminValuesPerLayer[ shp.type ];
-      shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
-        .pipe( through.obj( function( item, enc, next ){
-          // alpha3 filtering
-          if( filterAlpha3.length !== 3 || filterAlpha3 === item.properties.qs_adm0_a3 ){
-            this.push( item );
-          }
-          next();
-        }))
-        .pipe( mapper( shp.props, shp.type ) )
-        .pipe( through.obj(
+    var dataPipeline = shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
+      .pipe( through.obj( function( item, enc, next ){
+        // alpha3 filtering
+        if( filterAlpha3.length !== 3 || filterAlpha3 === item.properties.qs_adm0_a3 ){
+          this.push( item );
+        }
+        next();
+      }))
+      .pipe( mapper( shp.props, shp.type ) );
+
+    var elasticsearchPipeline = suggester.pipeline;
+    elasticsearchPipeline
+      .pipe( propStream.whitelist( allowedProperties ) )
+      .pipe( through.obj( function( item, enc, next ){
+        var id = item.id;
+        delete item.id;
+        this.push({
+          _index: 'pelias',
+          _type: shp.type,
+          _id: id,
+          data: item
+        });
+        next();
+      }))
+      .pipe( dbclient );
+
+    if( settings.imports.quattroshapes.adminLookup ){
+      peliasAdminLookup.lookup( function ( adminLookup ){
+        var adminValuesToSet = adminValuesPerLayer[ shp.type ];
+        var adminLookupStream = through.obj(
           function write( data, _, next ){
             var downstream = this;
             adminLookup.search( data.center_point, function ( adminValues ){
@@ -160,22 +175,14 @@ imports.forEach( function( shp ){
             adminLookup.end();
             done();
           }
-        ))
-        .pipe( suggester.pipeline )
-        .pipe( propStream.whitelist( allowedProperties ) )
-        .pipe( through.obj( function( item, enc, next ){
-          var id = item.id;
-          delete item.id;
-          this.push({
-            _index: 'pelias',
-            _type: shp.type,
-            _id: id,
-            data: item
-          });
-          next();
-        }))
-        .pipe( dbclient );
-    });
+        );
+
+        dataPipeline.pipe( adminLookupStream ).pipe( elasticsearchPipeline );
+      });
+    }
+    else {
+      dataPipeline.pipe( elasticsearchPipeline );
+    }
   }
 });
 
