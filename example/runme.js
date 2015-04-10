@@ -124,17 +124,18 @@ imports.forEach( function( shp ){
 
     // remove any props not in the schema mapping
     var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
+    var allAdminValues = [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1', 'admin2' ];
+    var adminValuesPerLayer = {
+      admin0: [ 'alpha3' ],
+      admin1: [ 'alpha3', 'admin0', 'admin1_abbr' ],
+      admin2: [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1' ],
+      local_admin: allAdminValues,
+      locality: allAdminValues,
+      neighborhood: allAdminValues
+    };
 
     peliasAdminLookup.lookup( function ( adminLookup ){
-      var allAdminValues = [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1', 'admin2' ];
-      var adminValuesToSet = {
-        admin0: [ 'alpha3' ],
-        admin1: [ 'alpha3', 'admin0', 'admin1_abbr' ],
-        admin2: [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1' ],
-        local_admin: allAdminValues,
-        locality: allAdminValues,
-        neighborhood: allAdminValues
-      };
+      var adminValuesToSet = adminValuesPerLayer[ shp.type ];
       shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
         .pipe( through.obj( function( item, enc, next ){
           // alpha3 filtering
@@ -148,7 +149,7 @@ imports.forEach( function( shp ){
           function write( data, _, next ){
             var downstream = this;
             adminLookup.search( data.center_point, function ( adminValues ){
-              adminValuesToSet[ shp.type ].forEach( function ( prop ){
+              adminValuesToSet.forEach( function ( prop ){
                 data[ prop ] = adminValues[ prop ];
               });
               downstream.push( data );
