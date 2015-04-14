@@ -7,13 +7,11 @@ var fs = require('fs'),
     propStream = require('prop-stream'),
     schema = require('pelias-schema'),
     through = require('through2'),
-    dbclient = require('pelias-dbclient')({ batchSize: 1 });
+    dbclient = require('pelias-dbclient')(),
+    peliasAdminLookup = require( 'pelias-admin-lookup' );
 
 // use datapath setting from your config file
 var basepath = settings.imports.quattroshapes.datapath;
-
-// testing
-// basepath = '/media/hdd/osm/quattroshapes/simplified';
 
 var imports = [
   {
@@ -123,8 +121,17 @@ imports.forEach( function( shp ){
 
     // remove any props not in the schema mapping
     var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
+    var allAdminValues = [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1', 'admin2' ];
+    var adminValuesPerLayer = {
+      admin0: [ 'alpha3' ],
+      admin1: [ 'alpha3', 'admin0', 'admin1_abbr' ],
+      admin2: [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1' ],
+      local_admin: allAdminValues,
+      locality: allAdminValues,
+      neighborhood: allAdminValues
+    };
 
-    shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
+    var dataPipeline = shapefile.createReadStream( shp.path, { encoding: 'UTF-8' } )
       .pipe( through.obj( function( item, enc, next ){
         // alpha3 filtering
         if( filterAlpha3.length !== 3 || filterAlpha3 === item.properties.qs_adm0_a3 ){
@@ -132,8 +139,10 @@ imports.forEach( function( shp ){
         }
         next();
       }))
-      .pipe( mapper( shp.props, shp.type ) )
-      .pipe( suggester.pipeline )
+      .pipe( mapper( shp.props, shp.type ) );
+
+    var elasticsearchPipeline = suggester.pipeline;
+    elasticsearchPipeline
       .pipe( propStream.whitelist( allowedProperties ) )
       .pipe( through.obj( function( item, enc, next ){
         var id = item.id;
@@ -147,6 +156,33 @@ imports.forEach( function( shp ){
         next();
       }))
       .pipe( dbclient );
+
+    if( settings.imports.quattroshapes.adminLookup ){
+      peliasAdminLookup.lookup( function ( adminLookup ){
+        var adminValuesToSet = adminValuesPerLayer[ shp.type ];
+        var adminLookupStream = through.obj(
+          function write( data, _, next ){
+            var downstream = this;
+            adminLookup.search( data.center_point, function ( adminValues ){
+              adminValuesToSet.forEach( function ( prop ){
+                data[ prop ] = adminValues[ prop ];
+              });
+              downstream.push( data );
+              next();
+            });
+          },
+          function end( done ){
+            adminLookup.end();
+            done();
+          }
+        );
+
+        dataPipeline.pipe( adminLookupStream ).pipe( elasticsearchPipeline );
+      });
+    }
+    else {
+      dataPipeline.pipe( elasticsearchPipeline );
+    }
   }
 });
 
