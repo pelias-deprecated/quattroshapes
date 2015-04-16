@@ -88,12 +88,10 @@ function generateMapper( props, type ){
         }
       }
 
-      var center = centroid( data.geometry );
-      if( center === null ){
-        console.error( 'No centroid found.' );
-        center = {};
-      }
-      record.center_point = center;
+      record.center_point = {
+        lat: data.properties.lat,
+        lon: data.properties.lon
+      };
       this.push( record );
 
     } catch( e ) {
