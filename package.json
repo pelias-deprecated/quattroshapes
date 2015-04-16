@@ -13,8 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "geojson-extent": "^0.3.1",
-    "geolib": "^2.0.14",
-    "geopipes-elasticsearch-backend": "latest",
     "greedy-stream": "latest",
     "pelias-config": "latest",
     "pelias-dbclient": "^0.x.x",

@@ -2,8 +2,7 @@
 var greedy = require('greedy-stream'),
   through = require('through2'),
   trimmer = require('trimmer'),
-  admin1AbbreviationMap = require('../meta/us_states.json'),
-  centroid = require('./centroid');
+  admin1AbbreviationMap = require('../meta/us_states.json');
 
 function capitalize( str ) {
   if( 'string' !== typeof str ){ return ''; }
