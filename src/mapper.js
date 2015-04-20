@@ -1,9 +1,7 @@
 
 var greedy = require('greedy-stream'),
   through = require('through2'),
-  trimmer = require('trimmer'),
-  admin1AbbreviationMap = require('../meta/us_states.json'),
-  centroid = require('./centroid');
+  trimmer = require('trimmer');
 
 function capitalize( str ) {
   if( 'string' !== typeof str ){ return ''; }
@@ -79,21 +77,10 @@ function generateMapper( props, type ){
         }
       });
 
-      // admin1 abbreviations (cirrently only USA state shortcodes)
-      if( ( 'USA' === record.alpha3 || record.admin0 === 'United States' ) && record.admin1 !== undefined ){
-        var nameProp = record.admin1;
-        var abbr = admin1AbbreviationMap[ nameProp ];
-        if( abbr ){
-          record.admin1_abbr = abbr;
-        }
-      }
-
-      var center = centroid( data.geometry );
-      if( center === null ){
-        console.error( 'No centroid found.' );
-        center = {};
-      }
-      record.center_point = center;
+      record.center_point = {
+        lat: data.properties.lat,
+        lon: data.properties.lon
+      };
       this.push( record );
 
     } catch( e ) {
