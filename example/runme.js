@@ -23,6 +23,7 @@ var imports = [
       admin1: 'qs_a1',
       admin2: 'qs_a2',
       gn:     'gs_gn_id',
+      popularity: 'popularity',
       woe:    'qs_woe_id'
     },
     index:    'pelias',
@@ -37,6 +38,7 @@ var imports = [
       admin1: 'qs_a1',
       admin2: 'qs_a2',
       gn:     'gs_gn_id',
+      popularity: 'popularity',
       woe:    'qs_woe_id'
     },
     index:    'pelias',
@@ -51,6 +53,7 @@ var imports = [
       admin1: 'qs_a1',
       admin2: 'qs_a2',
       gn:     'gs_gn_id',
+      popularity: 'popularity',
       woe:    'qs_woe_id'
     },
     index:    'pelias',
@@ -65,6 +68,7 @@ var imports = [
       admin1: 'qs_a1',
       admin2: 'qs_a2',
       gn:     'gs_gn_id',
+      popularity: 'popularity',
       woe:    'qs_woe_id'
     },
     index:    'pelias',
@@ -79,6 +83,7 @@ var imports = [
       admin1: 'qs_a1',
       admin2: 'qs_a2',
       gn:     'gs_gn_id',
+      popularity: 'popularity',
       woe:    'qs_woe_id'
     },
     index:    'pelias',
@@ -93,6 +98,7 @@ var imports = [
       admin1: 'name_adm1',
       admin2: 'name_adm2',
       gn:     'gn_id',
+      popularity: 'photo_sum',
       woe:    'woe_lau'
     },
     index:    'pelias',
