@@ -64,7 +64,8 @@ function generateMapper( props, type ){
         admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
         admin2: capitalize( data.properties[ props.admin2 ] ) || undefined,
         gn_id:  parseInt( data.properties[ props.gn ], 10 ), // some ids are comma seperated
-        woe_id: parseInt( data.properties[ props.woe ], 10 ) // as per "5860714,5860715"
+        woe_id: parseInt( data.properties[ props.woe ], 10 ), // as per "5860714,5860715"
+        popularity: data.properties[ props.popularity ]
         // boundaries: data.geometry
       };
 
