@@ -126,7 +126,7 @@ imports.forEach( function( shp ){
     }
 
     // remove any props not in the schema mapping
-    var allowedProperties = Object.keys( schema.mappings[ shp.type ].properties ).concat( [ 'id', 'type' ] );
+    var allowedProperties = Object.keys( schema.mappings._default_.properties ).concat( [ 'id', 'type' ] );
     var allAdminValues = [ 'alpha3', 'admin0', 'admin1_abbr', 'admin1', 'admin2' ];
     var adminValuesPerLayer = {
       admin0: [ 'alpha3' ],
