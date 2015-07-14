@@ -18,7 +18,6 @@
     "pelias-dbclient": "^0.x.x",
     "pelias-schema": "latest",
     "pelias-admin-lookup": "^2.x.x",
-    "pelias-suggester-pipeline": "^1.0.0",
     "prop-stream": "0.0.0",
     "shapefile-stream": "latest",
     "through2": "^0.6.1",

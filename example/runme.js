@@ -1,7 +1,6 @@
 
 var fs = require('fs'),
     shapefile = require('shapefile-stream'),
-    suggester = require('pelias-suggester-pipeline'),
     settings = require('pelias-config').generate(),
     mapper = require('../src/mapper'),
     propStream = require('prop-stream'),
@@ -147,12 +146,12 @@ imports.forEach( function( shp ){
       }))
       .pipe( mapper( shp.props, shp.type ) );
 
-    var elasticsearchPipeline = suggester.pipeline;
+    var elasticsearchPipeline = propStream.whitelist( allowedProperties );
     elasticsearchPipeline
-      .pipe( propStream.whitelist( allowedProperties ) )
       .pipe( through.obj( function( item, enc, next ){
         var id = item.id;
         delete item.id;
+        item.phrase = item.name;
         this.push({
           _index: 'pelias',
           _type: shp.type,
