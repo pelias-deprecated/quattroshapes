@@ -1,5 +1,5 @@
 #### Installation
-1. `wget http://quattroshapes.mapzen.com/quattroshapes-simplified.tar.gz`
+1. `wget http://quattroshapes.mapzen.com/quattroshapes/quattroshapes-simplified.tar.gz`
 2. `git clone https://github.com/pelias/quattroshapes.git && cd quattroshapes`;
 3. `npm install`;
 4. follow [these instructions](https://github.com/pelias/config#local-config) to define the quattroshapes datapath in your local config.
