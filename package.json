@@ -6,6 +6,11 @@
   "directories": {
     "example": "example"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:pelias/quattroshapes.git"
+  },
+
   "scripts": {
     "test": "node test/test | tap-spec"
   },
