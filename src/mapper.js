@@ -59,6 +59,7 @@ function generateMapper( props, type ){
           type: type, // required to generate the unique id
         },
         name: {},
+        source: 'quattroshapes',
         alpha3: ( data.properties[ props.alpha3 ] || '' ).toUpperCase() || undefined,
         admin0: capitalize( data.properties[ props.admin0 ] ) || undefined,
         admin1: capitalize( data.properties[ props.admin1 ] ) || undefined,
